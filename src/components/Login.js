@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import './css/Login.css'
+import { useNavigate } from 'react-router-dom';
+
 // import logo from './AICTE-192x192.png';
 
 export default function Login(props) {
     const [currentPage, setCurrentPage] = useState(props.initialPage);
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [accountType, setAccountType] = useState('');
+    const loginEndPoint = "http://localhost:5000/loginservices"
+    const history = useNavigate();
 
     const showCreateAccount = () => { setCurrentPage('createAccount'); };
     const showForgotPassword = () => { setCurrentPage('forgotPassword'); };
@@ -13,9 +17,23 @@ export default function Login(props) {
 
     useEffect(() => { setCurrentPage(props.initialPage); }, [props.initialPage]);
 
-    const handleLoginSubmit = (event) => {
+    const handleLoginSubmit = async (event) => {
         event.preventDefault();
-        // const response
+        const response = await fetch(loginEndPoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        }).then(data => {
+            props.showAlert("Login Successful", "success");
+            history('/');
+        }).catch(error => { props.showAlert("Wrong Credentials", "danger"); });
     };
 
     const handleForgotPasswordSubmit = (event) => {
@@ -36,7 +54,7 @@ export default function Login(props) {
 
     return (
         <>
-            <div className='container' style={{marginTop:"4rem"}}>
+            <div className='container' style={{ marginTop: "4rem" }}>
                 {currentPage === 'login' && (
                     <div id="loginPage" className="login-container">
                         <div className="logo-container">
@@ -97,7 +115,10 @@ export default function Login(props) {
                             </div>
                             <div className="mb-3">
                                 <span className={`text-center mb-4 text-${props.mode === 'light' ? 'dark' : 'light'}`}>Choose One: </span>
-                                <select className={`text-center mb-4 text-${props.mode === 'light' ? 'dark' : 'light'}`} value={accountType} onChange={handleDropdownChange}>
+                                <select className={`text-center mb-4`} value={accountType} onChange={handleDropdownChange} style={{
+                                    backgroundColor: props.mode === 'light' ? '#fff' : '#042743',
+                                    color: props.mode === 'light' ? '#042743' : '#fff'
+                                }}>
                                     <option value="" className={`text-${props.mode === 'light' ? 'dark' : 'light'}`} disabled>Select an option</option>
                                     <option value="administrator" className={`text-${props.mode === 'light' ? 'dark' : 'light'}`}>Administrator</option>
                                     <option value="evaluator" className={`text-${props.mode === 'light' ? 'dark' : 'light'}`}>Evaluator</option>

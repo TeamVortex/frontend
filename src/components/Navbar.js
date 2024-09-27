@@ -23,7 +23,6 @@ export default function Navbar(props) {
                   </li>
 
                   <div className='d-flex me-2'>
-
                     <li className="nav-item dropdown">
                       <Link className="nav-link dropdown-toggle" to="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i className="fa-solid fa-lg fa-user"></i>
@@ -34,10 +33,10 @@ export default function Navbar(props) {
                       </ul>
                     </li>
                   </div>
-                  <div className={`form-check mx-2 form-switch text-${props.mode === 'light' ? 'dark' : 'light'}`}>
+                  <div className={`form-check mx-2 my-2 form-switch text-${props.mode === 'light' ? 'dark' : 'light'}`}>
                     <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" onClick={props.toggleMode} />
                   </div>
-                    <label className={`form-check-label text-${props.mode === 'light' ? 'dark' : 'dark'}`} htmlFor="flexSwitchCheckDefault">
+                    <label className={`form-check-label my-2 text-${props.mode === 'light' ? 'dark' : 'dark'}`} htmlFor="flexSwitchCheckDefault">
                       Enable {props.mode === 'light' ? 'dark' : 'dark'} mode
                     </label>
                 </ul>

@@ -38,9 +38,9 @@ function App() {
       <Navbar showAlert={showAlert} toggleMode={toggleMode}/>
       <Alert alert={alert} />
       <Routes>
-        <Route path='/' element={<Home mode={mode}/>} />
-        <Route path='/login' element={<Login initialPage={'login'} mode={mode}/>} />
-        <Route path='/signup' element={<Login initialPage={'createAccount'} mode={mode}/>} />
+        <Route path='/' element={<Home mode={mode} showAlert={showAlert}/>} />
+        <Route path='/login' element={<Login initialPage={'login'} mode={mode} showAlert={showAlert}/>} />
+        <Route path='/signup' element={<Login initialPage={'createAccount'} mode={mode} showAlert={showAlert}/>} />
         <Route path='/fileupload' element={<FileUpload />} />
       </Routes>
     </Router>

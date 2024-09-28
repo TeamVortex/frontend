@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import './css/Home.css'
+import { useNavigate } from 'react-router-dom';
 
 export default function Home(props) {
     const [modalSet, setModalSet] = useState(props.role);
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
+    const history = useNavigate();
 
     const fetchData = async () => {
-        // Simulated fetch request; replace with your actual API call
         const mockData = {
             totalDocuments: 100,
             statusCounts: {
@@ -26,7 +27,6 @@ export default function Home(props) {
                     rejectionRate: 16.67, // percentage
                     feedbackCount: 3,
                 },
-                // Add more evaluators...
             ],
             rejectionReasons: [
                 "Incomplete documents",
@@ -70,6 +70,52 @@ export default function Home(props) {
         setLoading(false);
     };
 
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const sscFile = event.target.ssc_marksheet.files[0];
+        const hscFile = event.target.hsc_marksheet.files[0];
+        const maxFileSize = 2 * 1024 * 1024;
+
+        if (!sscFile || !hscFile) {
+            props.showAlert("Please upload both SSC and HSC marksheets.","primary");
+            return;
+        }
+        const validateFile = (file) => {
+            if (!file) return false;
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+            return allowedTypes.includes(file.type) && file.size <= maxFileSize;
+        };
+    
+        if (!validateFile(sscFile) || !validateFile(hscFile)) {
+            alert("Please ensure both files are in PDF or image format (JPG, PNG, JPEG) and not larger than 2MB.");
+            return;
+        }
+    
+        const formData = new FormData();
+        formData.append('ssc_marksheet', sscFile);
+        formData.append('hsc_marksheet', hscFile);
+    
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Error: ${response.status} ${errorText}`);
+            }
+    
+            const result = await response.json();
+            props.showAlert("Files uploaded successfully!","sucess");
+            history('/');
+        } catch (error) {
+            console.error('Error:', error);
+            props.showAlert("An error occurred while uploading the files.","danger");
+        }
+    };
+    
+    
     useEffect(() => {
         fetchData();
     }, []);
@@ -131,14 +177,14 @@ export default function Home(props) {
                                     </div>
                                 </div>
                                 <div className='col-md-6 right_section_2'>
-                                    <img src={`${process.env.PUBLIC_URL}/eval_1.png`} alt="evaluation image" className="Eval_Image" style={{width:'30rem', height:'15rem'}}/>
+                                    <img src={`${process.env.PUBLIC_URL}/eval_1.png`} alt="evaluation_image" className="Eval_Image" style={{width:'30rem', height:'15rem'}}/>
                                 </div>
                             </div>
 
 
                             <div className='row'>
                                 <div className='col-md-6 left_section_3'>
-                                <img src={`${process.env.PUBLIC_URL}/eval_2.jpg`} alt="evaluation image" className="Eval_Image" style={{width:'30rem', height:'20rem'}}/>
+                                <img src={`${process.env.PUBLIC_URL}/eval_2.jpg`} alt="evaluation_image" className="Eval_Image" style={{width:'30rem', height:'20rem'}}/>
                                 </div>
                                 <div className='col-md-6 right_section_3'>
                                     <div className="document-review-history">
@@ -188,7 +234,25 @@ export default function Home(props) {
                             </>)}
 
                     {modalSet === 'college' && (<>
-                        <div className='row'>
+                        <div className='row clgFileUpload'>
+                                <div className="college_data mb-3 mt-5">
+                                    <div className='clg_heading'><h2>College Data</h2> </div>
+                                    <form onSubmit={handleSubmit}>
+                                        <div className="form-group">
+                                            <label htmlFor="ssc_marksheet" className='mx-2'>SSC Marksheet: </label>
+                                            <input type="file" name='ssc_marksheet' accept=".pdf, .jpg, .jpeg, .png"/>
+                                        </div>
+                                        <div className="form-group">
+                                            <label htmlFor="hsc_marksheet" className='mx-2'>HSC Marksheet: </label>
+                                            <input type="file" name='hsc_marksheet' accept=".pdf, .jpg, .jpeg, .png"/>
+                                        </div>
+                                        <button type="submit" className='college-btn'>Submit</button>
+                                    </form>
+                                </div>
+                            </div>
+
+
+                        <div className='row mt-5'>
                             <div className='col-md-6 left_section_4'>
                                 <div className="feedback-issues">
                                     <h2>Feedback and Issues</h2>
@@ -214,7 +278,7 @@ export default function Home(props) {
                             </div>
 
                             <div className='col-md-6 right_section_4'>
-                            <img src={`${process.env.PUBLIC_URL}/clg_1.jpg`} alt="evaluation image" className="Eval_Image" style={{width:'30rem', height:'15rem', mixBlendMode:'inherit'}}/>
+                            <img src={`${process.env.PUBLIC_URL}/clg_2.png`} alt="clg_image" className="Eval_Image" style={{width:'30rem', height:'15rem', backgroundColor:'white'}}/>
                             </div>
                         </div>
                             </>
@@ -233,41 +297,41 @@ export default function Home(props) {
                                             <div className='row'>
                                                 <div className='col-md-6'>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="collegeName" className="form-label">College Name</label>
+                                                        <label htmlFor="collegeName" className="form-label">College Name</label>
                                                         <input type="text" className="form-control" id="collegeName" placeholder="Enter College Name" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="institutionType" className="form-label">Institution Type</label>
+                                                        <label htmlFor="institutionType" className="form-label">Institution Type</label>
                                                         <input type="text" className="form-control" id="institutionType" placeholder="Enter Institution Type" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="approvalYear" className="form-label">AICTE Approval Year</label>
+                                                        <label htmlFor="approvalYear" className="form-label">AICTE Approval Year</label>
                                                         <input type="text" className="form-control" id="approvalYear" placeholder="Enter AICTE Approval Year" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="address" className="form-label">Address</label>
+                                                        <label htmlFor="address" className="form-label">Address</label>
                                                         <textarea className="form-control" id="address" rows="4" placeholder="Enter Address"></textarea>
                                                     </div>
                                                 </div>
                                                 <div className='col-md-6'>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="universityName" className="form-label">University Name</label>
+                                                        <label htmlFor="universityName" className="form-label">University Name</label>
                                                         <input type="text" className="form-control" id="universityName" placeholder="Enter University Name" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="approvalNo" className="form-label">AICTE Approval No</label>
+                                                        <label htmlFor="approvalNo" className="form-label">AICTE Approval No</label>
                                                         <input type="text" className="form-control" id="approvalNo" placeholder="Enter AICTE Approval No" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="nbaAccreditations" className="form-label">NBA Accreditations</label>
+                                                        <label htmlFor="nbaAccreditations" className="form-label">NBA Accreditations</label>
                                                         <input type="text" className="form-control" id="nbaAccreditations" placeholder="Enter NBA Accreditations" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="email" className="form-label">Email</label>
+                                                        <label htmlFor="email" className="form-label">Email</label>
                                                         <input type="email" className="form-control" id="email" placeholder="Enter Email" />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="coursesOffered" className="form-label">Courses Offered:</label>
+                                                        <label htmlFor="coursesOffered" className="form-label">Courses Offered:</label>
                                                         <input type="text" className="form-control" id="coursesOffered" placeholder="Enter Courses Offered" required />
                                                     </div>
                                                 </div>
@@ -296,19 +360,19 @@ export default function Home(props) {
                                             <div className='row'>
                                                 <div className='col-md-6'>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="evaluatorId" className="form-label">Evaluator Id:</label>
+                                                        <label htmlFor="evaluatorId" className="form-label">Evaluator Id:</label>
                                                         <input type="text" className="form-control" id="evaluatorId" placeholder="Enter Evaluator Id" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="designation" className="form-label">Designation</label>
+                                                        <label htmlFor="designation" className="form-label">Designation</label>
                                                         <input type="text" className="form-control" id="designation" placeholder="Enter Designation" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="expertiseArea" className="form-label">Expertise Area</label>
+                                                        <label htmlFor="expertiseArea" className="form-label">Expertise Area</label>
                                                         <input type="text" className="form-control" id="expertiseArea" placeholder="Enter Expertise Area" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="assignedColleges" className="form-label">Assigned Colleges:</label>
+                                                        <label htmlFor="assignedColleges" className="form-label">Assigned Colleges:</label>
                                                         <select multiple className="form-control" id="assignedColleges" required disabled>
                                                             <option value="college1">College 1</option>
                                                             <option value="college2">College 2</option>
@@ -318,19 +382,19 @@ export default function Home(props) {
                                                 </div>
                                                 <div className='col-md-6'>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="evaluatorName" className="form-label">Evaluator Name</label>
+                                                        <label htmlFor="evaluatorName" className="form-label">Evaluator Name</label>
                                                         <input type="text" className="form-control" id="evaluatorName" placeholder="Enter Evaluator Name" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="organization" className="form-label">Organization:</label>
+                                                        <label htmlFor="organization" className="form-label">Organization:</label>
                                                         <input type="text" className="form-control" id="organization" placeholder="Enter Organization Name" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="evaluationOffered" className="form-label">Evaluation Offered:</label>
+                                                        <label htmlFor="evaluationOffered" className="form-label">Evaluation Offered:</label>
                                                         <input type="text" className="form-control" id="evaluationOffered" placeholder="Enter Evaluation Offered" required />
                                                     </div>
                                                     <div className="mb-3">
-                                                        <label htmlhtmlFor="assignedRegion" className="form-label">Assigned Region</label>
+                                                        <label htmlFor="assignedRegion" className="form-label">Assigned Region</label>
                                                         <select multiple className="form-control" id="assignedRegion" required disabled>
                                                             <option value="region1">District 1</option>
                                                             <option value="region2">District 2</option>

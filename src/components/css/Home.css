@@ -35,13 +35,57 @@ textarea {
     width: 100%;
     padding: 1rem;
     background-color: #4CAF50;
-    color: white; 
-    border: none; 
-    border-radius: 0.4rem; 
-    cursor: pointer; 
-    font-size: 1rem; 
+    color: white;
+    border: none;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    font-size: 1rem;
 }
 
 button:hover {
     background-color: #45a049;
+}
+
+
+/* College Data Form Page */
+.clgFileUpload {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+
+    & .college_data {
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+    }
+
+    & .clg_heading {
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+
+    & form {
+        width: max-content;
+        height: 10rem;
+
+        & .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        & .college-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 0.4rem;
+            cursor: pointer;
+        }
+    }
 }

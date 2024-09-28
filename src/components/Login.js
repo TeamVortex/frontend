@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react';
 import './css/Login.css'
 import { useNavigate } from 'react-router-dom';
 
-// import logo from './AICTE-192x192.png';
-
 export default function Login(props) {
     const [currentPage, setCurrentPage] = useState(props.initialPage);
-    const [formData, setFormData] = useState({ email: '', password: '' });
+    const [formData, setFormData] = useState({ l_email: '', l_emailpassword: '' });
+    const [signupData, setSignupData] = useState({name:'', email: '', password: '' });
+    const [forgotPassData, setForgotPassData] = useState({ f_email: ''});
     const [accountType, setAccountType] = useState('');
-    const loginEndPoint = "http://localhost:5000/loginservices"
-    const history = useNavigate();
 
+    const loginEndPoint = "http://localhost:8080/";
+    const signupEndpoint = "http://localhost:8080/signupservices";
+    const forgotPassEndPoint = "http://localhost:5000/forgotpassservices";
+
+    const history = useNavigate();
     const showCreateAccount = () => { setCurrentPage('createAccount'); };
     const showForgotPassword = () => { setCurrentPage('forgotPassword'); };
     const showLogin = () => { setCurrentPage('login'); };
@@ -36,25 +39,55 @@ export default function Login(props) {
         }).catch(error => { props.showAlert("Wrong Credentials", "danger"); });
     };
 
-    const handleForgotPasswordSubmit = (event) => {
+    const handleForgotPasswordSubmit = async (event) => {
         event.preventDefault();
+        const response = await fetch(forgotPassEndPoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(forgotPassData)
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        }).then(data => {
+            props.showAlert("Login Successful", "success");
+            history('/');
+        }).catch(error => { props.showAlert("Wrong Credentials", "danger"); });
     };
 
-    const handleCreateAccountSubmit = (event) => {
+    const handleCreateAccountSubmit = async(event) => {
         event.preventDefault();
+        const response = await fetch(signupEndpoint,{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(signupData)
+        }).then(response=>{
+            if(!response.ok){
+                throw new Error('Network response was not ok'+response.statusText);
+            }
+            return response.json();
+        }).then(data=>{
+            props.showAlert("Signup Successful","success");
+            history("/login");
+        }).catch(error=>{props.showAlert("Enter Valid Credentials","danger");});
     };
-
 
     const handleChange = (e) => {
         const { id, value } = e.target;
         setFormData({ ...formData, [id]: value });
+        setSignupData({...signupData,[id]:value});
     };
 
     const handleDropdownChange = (e) => { setAccountType(e.target.value); };
 
     return (
         <>
-            <div className='container' style={{ marginTop: "4rem" }}>
+            <div className='container' style={{ marginTop: "2rem", marginBottom:'2rem'}}>
                 {currentPage === 'login' && (
                     <div id="loginPage" className="login-container">
                         <div className="logo-container">
@@ -64,11 +97,11 @@ export default function Login(props) {
                         <form onSubmit={handleLoginSubmit}>
                             <div className="mb-3">
                                 <label htmlFor="email" className={`form-label text-${props.mode === 'light' ? 'dark' : 'light'}`}>Email Address</label>
-                                <input type="email" className="form-control" id="email" onChange={handleChange} placeholder="Enter valid email" required />
+                                <input type="email" className="form-control" id="l_email" name='l_email' onChange={handleChange} placeholder="Enter valid email" required />
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="password" className={`form-label text-${props.mode === 'light' ? 'dark' : 'light'}`}>Password</label>
-                                <input type="password" className="form-control" id="password" onChange={handleChange} placeholder="Password" required />
+                                <input type="password" className="form-control" id="l_password" name='l_password' onChange={handleChange} placeholder="Password" required />
                             </div>
                             <button type="submit" className="btn btn-primary w-100">Login</button>
                             <div className="text-center mt-3">
@@ -92,7 +125,7 @@ export default function Login(props) {
                         <form onSubmit={handleForgotPasswordSubmit}>
                             <div className="mb-3">
                                 <label htmlFor="forgotEmail" className={`form-label text-${props.mode === 'light' ? 'dark' : 'light'}`}>Email Address</label>
-                                <input type="email" className="form-control" id="forgotEmail" placeholder="hello@aicte.in" required />
+                                <input type="email" name='f_email' className="form-control" id="f_email" placeholder="hello@aicte.in" required />
                             </div>
                             <button type="submit" className="btn btn-primary w-100">Password Reset</button>
                             <div className="text-center mt-3">
@@ -111,7 +144,7 @@ export default function Login(props) {
                         <form onSubmit={handleCreateAccountSubmit}>
                             <div className="mb-3">
                                 <label htmlFor="createName" className={`text-center mb-4 text-${props.mode === 'light' ? 'dark' : 'light'}`}>Name</label>
-                                <input type="text" className="form-control" id="createName" placeholder="Enter your name" required />
+                                <input type="text" className="form-control" id="name" name='name' placeholder="Enter your name" onChange={handleChange} required />
                             </div>
                             <div className="mb-3">
                                 <span className={`text-center mb-4 text-${props.mode === 'light' ? 'dark' : 'light'}`}>Choose One: </span>
@@ -127,11 +160,11 @@ export default function Login(props) {
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="createEmail" className={`text-center mb-4 text-${props.mode === 'light' ? 'dark' : 'light'}`}>Email Address</label>
-                                <input type="email" className="form-control" id="createEmail" placeholder="Enter valid email" required />
+                                <input type="email" className="form-control" id="email" name='email' onChange={handleChange} placeholder="Enter valid email" required />
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="createPassword" className={`text-center mb-4 text-${props.mode === 'light' ? 'dark' : 'light'}`}>Password</label>
-                                <input type="password" className="form-control" id="createPassword" placeholder="Password" required />
+                                <input type="password" className="form-control" id="password" name='password' onChange={handleChange} placeholder="Password" required />
                             </div>
                             <button type="submit" className="btn btn-primary w-100">Sign Up</button>
                             <div className="text-center mt-3">

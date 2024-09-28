@@ -6,6 +6,8 @@ import Alert from './components/Alert';
 import React, { useState } from 'react';
 import FileUpload from './components/FileUpload';
 import Home from './components/Home';
+import About from './components/About';
+import Footer from './components/Footer';
 
 function App() {
   const [alert, setAlert] = useState(null);
@@ -35,14 +37,16 @@ function App() {
 
   return (
     <Router>
-      <Navbar showAlert={showAlert} toggleMode={toggleMode}/>
+      <Navbar showAlert={showAlert} toggleMode={toggleMode} />
       <Alert alert={alert} />
       <Routes>
-        <Route path='/' element={<Home mode={mode} showAlert={showAlert}/>} />
+        <Route path='/' element={<Home mode={mode} showAlert={showAlert} role={'college'}/>} />
         <Route path='/login' element={<Login initialPage={'login'} mode={mode} showAlert={showAlert}/>} />
         <Route path='/signup' element={<Login initialPage={'createAccount'} mode={mode} showAlert={showAlert}/>} />
+        <Route path='/about' element={<About/>} />
         <Route path='/fileupload' element={<FileUpload />} />
       </Routes>
+      <Footer/>
     </Router>
   );
 }
